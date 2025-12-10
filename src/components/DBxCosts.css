@@ -2,6 +2,42 @@
   padding: 0;
 }
 
+.dbx-costs .overview-card {
+  margin-bottom: 24px;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.dbx-costs .overview-card .ant-card-head-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.dbx-costs .info-link {
+  color: #1890ff;
+  font-size: 14px;
+  font-weight: 400;
+  margin-left: 8px;
+  cursor: pointer;
+}
+
+.dbx-costs .metric-item {
+  padding: 8px 0;
+}
+
+.dbx-costs .metric-label {
+  font-size: 14px;
+  color: #595959;
+  margin-bottom: 8px;
+}
+
+.dbx-costs .metric-value {
+  font-size: 32px;
+  font-weight: 600;
+  color: #262626;
+}
+
 .dbx-card {
   margin-bottom: 24px;
   border-radius: 8px;

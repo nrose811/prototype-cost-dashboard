@@ -1,20 +1,20 @@
-.aws-costs {
+.cost-summary {
   padding: 0;
 }
 
-.overview-card {
+.cost-summary .overview-card {
   margin-bottom: 24px;
   border-radius: 8px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
-.overview-card .ant-card-head-title {
+.cost-summary .overview-card .ant-card-head-title {
   font-size: 18px;
   font-weight: 600;
   color: #262626;
 }
 
-.info-link {
+.cost-summary .info-link {
   color: #1890ff;
   font-size: 14px;
   font-weight: 400;
@@ -22,49 +22,54 @@
   cursor: pointer;
 }
 
-.metric-item {
+.cost-summary .metric-item {
   padding: 8px 0;
 }
 
-.metric-label {
+.cost-summary .metric-label {
   font-size: 14px;
   color: #595959;
   margin-bottom: 8px;
 }
 
-.metric-value {
+.cost-summary .metric-value {
   font-size: 32px;
   font-weight: 600;
   color: #262626;
 }
 
-.graph-card {
+.cost-summary .trend-card {
   margin-bottom: 24px;
   border-radius: 8px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
-.graph-card .ant-card-head-title {
+.cost-summary .trend-card .ant-card-head-title {
   font-size: 18px;
   font-weight: 600;
   color: #262626;
 }
 
-.graph-card .ant-card-body {
+.cost-summary .trend-card .ant-card-body {
   padding: 24px;
 }
 
-.graph-card .ant-table {
-  font-size: 14px;
+.cost-summary .donut-card {
+  margin-bottom: 24px;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
-.graph-card .ant-table-thead > tr > th {
-  background-color: #fafafa;
+.cost-summary .donut-card .ant-card-head-title {
+  font-size: 18px;
   font-weight: 600;
   color: #262626;
 }
 
-.graph-card .ant-pagination {
-  margin-top: 16px;
+.cost-summary .donut-card .ant-card-body {
+  padding: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 

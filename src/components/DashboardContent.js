@@ -8,6 +8,11 @@ import './DashboardContent.css';
 const DashboardContent = () => {
   const items = [
     {
+      key: 'summary',
+      label: 'Cost Summary',
+      children: <CostSummary />,
+    },
+    {
       key: 'aws',
       label: 'AWS Costs',
       children: <AWSCosts />,
@@ -16,11 +21,6 @@ const DashboardContent = () => {
       key: 'dbx',
       label: 'DBx Costs',
       children: <DBxCosts />,
-    },
-    {
-      key: 'summary',
-      label: 'Cost Summary',
-      children: <CostSummary />,
     },
   ];
 
@@ -31,7 +31,7 @@ const DashboardContent = () => {
       </div>
 
       <Tabs
-        defaultActiveKey="aws"
+        defaultActiveKey="summary"
         items={items}
         className="dashboard-tabs"
       />

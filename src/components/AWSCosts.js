@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Row, Col } from 'antd';
+import { Card, Row, Col, Table } from 'antd';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './AWSCosts.css';
 
@@ -82,6 +82,62 @@ const costData = [
     Kinesis: 1200,
     VPC: 900,
     Others: 1400
+  }
+];
+
+// Prepare table data with totals
+const tableDataWithTotals = costData.map((row, index) => {
+  const total = Object.keys(row)
+    .filter(key => key !== 'month')
+    .reduce((sum, key) => sum + (row[key] || 0), 0);
+
+  return {
+    key: index.toString(),
+    ...row,
+    TOTAL_COSTS: total
+  };
+});
+
+// Define service types for columns
+const awsServiceTypes = [
+  'Glue',
+  'Elastic Container Service',
+  'Relational Database Service',
+  'OpenSearch Service',
+  'CloudWatch',
+  'S3',
+  'EC2-Instances',
+  'Kinesis',
+  'VPC',
+  'Others'
+];
+
+// Define table columns
+const awsTableColumns = [
+  {
+    title: 'Month',
+    dataIndex: 'month',
+    key: 'month',
+    fixed: 'left',
+    width: 120,
+    sorter: (a, b) => a.month.localeCompare(b.month),
+  },
+  ...awsServiceTypes.map(serviceType => ({
+    title: serviceType,
+    dataIndex: serviceType,
+    key: serviceType,
+    width: 180,
+    render: (cost) => cost ? `$${cost.toLocaleString()}` : '$0',
+    sorter: (a, b) => (a[serviceType] || 0) - (b[serviceType] || 0),
+  })),
+  {
+    title: 'Total Costs',
+    dataIndex: 'TOTAL_COSTS',
+    key: 'TOTAL_COSTS',
+    fixed: 'right',
+    width: 120,
+    render: (cost) => `$${cost.toLocaleString()}`,
+    sorter: (a, b) => a.TOTAL_COSTS - b.TOTAL_COSTS,
   }
 ];
 
@@ -174,6 +230,20 @@ const AWSCosts = () => {
             />
           </LineChart>
         </ResponsiveContainer>
+      </Card>
+
+      {/* Cost by month and service type */}
+      <Card className="graph-card" title="Cost by month and service type">
+        <Table
+          columns={awsTableColumns}
+          dataSource={tableDataWithTotals}
+          pagination={{
+            pageSize: 6,
+            showSizeChanger: false,
+            position: ['bottomCenter']
+          }}
+          scroll={{ x: 'max-content' }}
+        />
       </Card>
     </div>
   );
