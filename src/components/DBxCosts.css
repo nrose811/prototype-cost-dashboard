@@ -1,0 +1,34 @@
+.dbx-costs {
+  padding: 0;
+}
+
+.dbx-card {
+  margin-bottom: 24px;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.dbx-card .ant-card-head-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.dbx-card .ant-card-body {
+  padding: 24px;
+}
+
+.dbx-card .ant-table {
+  font-size: 14px;
+}
+
+.dbx-card .ant-table-thead > tr > th {
+  background-color: #fafafa;
+  font-weight: 600;
+  color: #262626;
+}
+
+.dbx-card .ant-pagination {
+  margin-top: 16px;
+}
+
