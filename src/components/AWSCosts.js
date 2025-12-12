@@ -141,9 +141,26 @@ const awsTableColumns = [
   }
 ];
 
-const AWSCosts = () => {
+const AWSCosts = ({ tenantType = 'ST' }) => {
+  // For MT, only show ECS (Compute) and S3 (Storage)
+  const mtAwsServices = ['Elastic Container Service', 'S3'];
+
+  // Filter data based on tenant type
+  const filteredCostData = costData.map(monthData => {
+    if (tenantType === 'MT') {
+      const filtered = { month: monthData.month };
+      mtAwsServices.forEach(service => {
+        if (monthData[service] !== undefined) {
+          filtered[service] = monthData[service];
+        }
+      });
+      return filtered;
+    }
+    return monthData;
+  });
+
   // Calculate aggregated costs for trend chart
-  const trendData = costData.map(monthData => {
+  const trendData = filteredCostData.map(monthData => {
     const total = Object.keys(monthData)
       .filter(key => key !== 'month')
       .reduce((sum, key) => sum + monthData[key], 0);
@@ -187,22 +204,22 @@ const AWSCosts = () => {
       {/* Cost and usage graph */}
       <Card className="graph-card" title="Cost and usage graph">
         <ResponsiveContainer width="100%" height={400}>
-          <BarChart data={costData}>
+          <BarChart data={filteredCostData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis dataKey="month" />
             <YAxis label={{ value: 'Costs ($)', angle: -90, position: 'insideLeft' }} />
             <Tooltip />
             <Legend />
-            <Bar dataKey="Glue" stackId="a" fill="#7B68EE" />
+            {tenantType === 'ST' && <Bar dataKey="Glue" stackId="a" fill="#7B68EE" />}
             <Bar dataKey="Elastic Container Service" stackId="a" fill="#C75B7A" />
-            <Bar dataKey="Relational Database Service" stackId="a" fill="#5DADE2" />
-            <Bar dataKey="OpenSearch Service" stackId="a" fill="#9B59B6" />
-            <Bar dataKey="CloudWatch" stackId="a" fill="#E67E22" />
+            {tenantType === 'ST' && <Bar dataKey="Relational Database Service" stackId="a" fill="#5DADE2" />}
+            {tenantType === 'ST' && <Bar dataKey="OpenSearch Service" stackId="a" fill="#9B59B6" />}
+            {tenantType === 'ST' && <Bar dataKey="CloudWatch" stackId="a" fill="#E67E22" />}
             <Bar dataKey="S3" stackId="a" fill="#3498DB" />
-            <Bar dataKey="EC2-Instances" stackId="a" fill="#922B21" />
-            <Bar dataKey="Kinesis" stackId="a" fill="#16A085" />
-            <Bar dataKey="VPC" stackId="a" fill="#7D6608" />
-            <Bar dataKey="Others" stackId="a" fill="#A0826D" />
+            {tenantType === 'ST' && <Bar dataKey="EC2-Instances" stackId="a" fill="#922B21" />}
+            {tenantType === 'ST' && <Bar dataKey="Kinesis" stackId="a" fill="#16A085" />}
+            {tenantType === 'ST' && <Bar dataKey="VPC" stackId="a" fill="#7D6608" />}
+            {tenantType === 'ST' && <Bar dataKey="Others" stackId="a" fill="#A0826D" />}
           </BarChart>
         </ResponsiveContainer>
       </Card>

@@ -417,19 +417,41 @@ const columns = [
   }
 ];
 
-const DBxCosts = () => {
+const DBxCosts = ({ tenantType = 'ST' }) => {
+  // For MT, only show compute and storage services
+  const mtDbxServices = ['JOBS', 'ALL_PURPOSE', 'SQL', 'STORAGE'];
+
+  // Filter monthly data based on tenant type
+  const filteredMonthlyData = monthlyData.map(monthData => {
+    if (tenantType === 'MT') {
+      const filtered = { month: monthData.month };
+      mtDbxServices.forEach(service => {
+        if (monthData[service] !== undefined) {
+          filtered[service] = monthData[service];
+        }
+      });
+      return filtered;
+    }
+    return monthData;
+  });
+
+  // Filter service type data
+  const filteredServiceTypeData = tenantType === 'MT'
+    ? serviceTypeData.filter(service => mtDbxServices.includes(service.serviceType))
+    : serviceTypeData;
+
   // Calculate summary metrics
-  const totalCost = monthlyData.reduce((sum, month) => {
+  const totalCost = filteredMonthlyData.reduce((sum, month) => {
     const monthTotal = Object.keys(month)
       .filter(key => key !== 'month')
       .reduce((monthSum, key) => monthSum + month[key], 0);
     return sum + monthTotal;
   }, 0);
-  const averageMonthlyCost = totalCost / monthlyData.length;
-  const serviceCount = serviceTypeData.length;
+  const averageMonthlyCost = totalCost / filteredMonthlyData.length;
+  const serviceCount = filteredServiceTypeData.length;
 
   // Calculate aggregated costs for trend chart
-  const trendData = monthlyData.map(monthData => {
+  const trendData = filteredMonthlyData.map(monthData => {
     const total = Object.keys(monthData)
       .filter(key => key !== 'month')
       .reduce((sum, key) => sum + monthData[key], 0);
@@ -472,27 +494,27 @@ const DBxCosts = () => {
       {/* Usage Cost by month */}
       <Card className="dbx-card" title="Usage Cost by month for the last 12 months">
         <ResponsiveContainer width="100%" height={400}>
-          <BarChart data={monthlyData}>
+          <BarChart data={filteredMonthlyData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis dataKey="month" />
             <YAxis label={{ value: 'Usage (in USD)', angle: -90, position: 'insideLeft' }} />
             <Tooltip />
             <Legend />
             <Bar dataKey="ALL_PURPOSE" stackId="a" fill="#7B68EE" />
-            <Bar dataKey="MODEL_SERVING" stackId="a" fill="#C75B7A" />
+            {tenantType === 'ST' && <Bar dataKey="MODEL_SERVING" stackId="a" fill="#C75B7A" />}
             <Bar dataKey="JOBS" stackId="a" fill="#5DADE2" />
-            <Bar dataKey="VECTOR_SEARCH" stackId="a" fill="#9B59B6" />
+            {tenantType === 'ST' && <Bar dataKey="VECTOR_SEARCH" stackId="a" fill="#9B59B6" />}
             <Bar dataKey="SQL" stackId="a" fill="#E67E22" />
-            <Bar dataKey="APPS" stackId="a" fill="#3498DB" />
-            <Bar dataKey="INTERACTIVE" stackId="a" fill="#922B21" />
-            <Bar dataKey="NETWORKING" stackId="a" fill="#16A085" />
-            <Bar dataKey="PREDICTIVE_OPTIMIZATION" stackId="a" fill="#7D6608" />
+            {tenantType === 'ST' && <Bar dataKey="APPS" stackId="a" fill="#3498DB" />}
+            {tenantType === 'ST' && <Bar dataKey="INTERACTIVE" stackId="a" fill="#922B21" />}
+            {tenantType === 'ST' && <Bar dataKey="NETWORKING" stackId="a" fill="#16A085" />}
+            {tenantType === 'ST' && <Bar dataKey="PREDICTIVE_OPTIMIZATION" stackId="a" fill="#7D6608" />}
             <Bar dataKey="STORAGE" stackId="a" fill="#A0826D" />
-            <Bar dataKey="DLT" stackId="a" fill="#E74C3C" />
-            <Bar dataKey="ONLINE_TABLES" stackId="a" fill="#27AE60" />
-            <Bar dataKey="AGENT_EVALUATION" stackId="a" fill="#F39C12" />
-            <Bar dataKey="DEFAULT_STORAGE" stackId="a" fill="#8E44AD" />
-            <Bar dataKey="ALL_ANYWAY" stackId="a" fill="#34495E" />
+            {tenantType === 'ST' && <Bar dataKey="DLT" stackId="a" fill="#E74C3C" />}
+            {tenantType === 'ST' && <Bar dataKey="ONLINE_TABLES" stackId="a" fill="#27AE60" />}
+            {tenantType === 'ST' && <Bar dataKey="AGENT_EVALUATION" stackId="a" fill="#F39C12" />}
+            {tenantType === 'ST' && <Bar dataKey="DEFAULT_STORAGE" stackId="a" fill="#8E44AD" />}
+            {tenantType === 'ST' && <Bar dataKey="ALL_ANYWAY" stackId="a" fill="#34495E" />}
           </BarChart>
         </ResponsiveContainer>
       </Card>

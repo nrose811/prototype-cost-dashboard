@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, Row, Col } from 'antd';
 import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import TDPCostsTable from './TDPCostsTable';
 import './CostSummary.css';
 
 // AWS Cost Data (from AWSCosts.js)
@@ -120,22 +121,45 @@ const dbxServiceTypeData = [
   { serviceType: 'ALL_ANYWAY', usage: 200 }
 ];
 
-const CostSummary = () => {
+const CostSummary = ({ tenantType = 'ST' }) => {
+  // Define which services to show for MT (only Compute/ECS, Storage/S3, and Access/Athena)
+  const mtAwsServices = ['Elastic Container Service', 'S3'];
+  const mtDbxServices = ['JOBS', 'ALL_PURPOSE', 'SQL', 'STORAGE'];
+
+  // Filter AWS data based on tenant type
+  const filteredAwsCostData = awsCostData.map(monthData => {
+    if (tenantType === 'MT') {
+      const filtered = { month: monthData.month };
+      mtAwsServices.forEach(service => {
+        if (monthData[service] !== undefined) {
+          filtered[service] = monthData[service];
+        }
+      });
+      return filtered;
+    }
+    return monthData;
+  });
+
+  // Filter DBx service type data based on tenant type
+  const filteredDbxServiceTypeData = tenantType === 'MT'
+    ? dbxServiceTypeData.filter(service => mtDbxServices.includes(service.serviceType))
+    : dbxServiceTypeData;
+
   // Calculate AWS totals
-  const awsTotalCost = awsCostData.reduce((sum, monthData) => {
+  const awsTotalCost = filteredAwsCostData.reduce((sum, monthData) => {
     const monthTotal = Object.keys(monthData)
       .filter(key => key !== 'month')
       .reduce((monthSum, key) => monthSum + monthData[key], 0);
     return sum + monthTotal;
   }, 0);
 
-  const awsAverageMonthlyCost = awsTotalCost / awsCostData.length;
-  const awsServiceCount = 38; // From AWS dashboard KPI
+  const awsAverageMonthlyCost = awsTotalCost / filteredAwsCostData.length;
+  const awsServiceCount = tenantType === 'MT' ? mtAwsServices.length : 38; // From AWS dashboard KPI
 
   // Calculate DBx totals
-  const dbxTotalCost = dbxMonthlyData.reduce((sum, month) => sum + month.usage, 0);
+  const dbxTotalCost = filteredDbxServiceTypeData.reduce((sum, service) => sum + service.usage, 0);
   const dbxAverageMonthlyCost = dbxTotalCost / dbxMonthlyData.length;
-  const dbxServiceCount = 15; // From DBx dashboard KPI
+  const dbxServiceCount = tenantType === 'MT' ? mtDbxServices.length : 15; // From DBx dashboard KPI
 
   // Calculate combined totals
   const combinedTotalCost = awsTotalCost + dbxTotalCost;
@@ -143,8 +167,8 @@ const CostSummary = () => {
   const combinedServiceCount = awsServiceCount + dbxServiceCount; // 38 + 15 = 53
 
   // Create combined monthly trend data
-  // First, calculate AWS monthly totals
-  const awsMonthlyTotals = awsCostData.map(monthData => {
+  // First, calculate AWS monthly totals (using filtered data)
+  const awsMonthlyTotals = filteredAwsCostData.map(monthData => {
     const total = Object.keys(monthData)
       .filter(key => key !== 'month')
       .reduce((sum, key) => sum + monthData[key], 0);
@@ -175,9 +199,9 @@ const CostSummary = () => {
   });
 
   // Calculate average cost per service across all months
-  // AWS services
+  // AWS services (using filtered data)
   const awsServiceAverages = {};
-  awsCostData.forEach(monthData => {
+  filteredAwsCostData.forEach(monthData => {
     Object.keys(monthData)
       .filter(key => key !== 'month')
       .forEach(service => {
@@ -190,12 +214,12 @@ const CostSummary = () => {
 
   // Convert to average
   Object.keys(awsServiceAverages).forEach(service => {
-    awsServiceAverages[service] = awsServiceAverages[service] / awsCostData.length;
+    awsServiceAverages[service] = awsServiceAverages[service] / filteredAwsCostData.length;
   });
 
-  // DBx services - calculate average from service type data
+  // DBx services - calculate average from service type data (using filtered data)
   const dbxServiceAverages = {};
-  dbxServiceTypeData.forEach(service => {
+  filteredDbxServiceTypeData.forEach(service => {
     // Average is total usage divided by number of months
     dbxServiceAverages[service.serviceType] = service.usage / dbxMonthlyData.length;
   });
@@ -338,6 +362,9 @@ const CostSummary = () => {
           </Card>
         </Col>
       </Row>
+
+      {/* TDP Costs Table */}
+      <TDPCostsTable tenantType={tenantType} />
     </div>
   );
 };

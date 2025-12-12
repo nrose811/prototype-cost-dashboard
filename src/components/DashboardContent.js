@@ -5,22 +5,22 @@ import DBxCosts from './DBxCosts';
 import CostSummary from './CostSummary';
 import './DashboardContent.css';
 
-const DashboardContent = () => {
+const DashboardContent = ({ tenantType }) => {
   const items = [
     {
       key: 'summary',
       label: 'Cost Summary',
-      children: <CostSummary />,
+      children: <CostSummary tenantType={tenantType} />,
     },
     {
       key: 'aws',
       label: 'AWS Costs',
-      children: <AWSCosts />,
+      children: <AWSCosts tenantType={tenantType} />,
     },
     {
       key: 'dbx',
       label: 'DBx Costs',
-      children: <DBxCosts />,
+      children: <DBxCosts tenantType={tenantType} />,
     },
   ];
 

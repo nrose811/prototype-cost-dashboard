@@ -1,0 +1,72 @@
+.tdp-costs-card {
+  margin-top: 24px;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.tdp-costs-card .ant-card-head {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.tdp-costs-card .ant-card-head-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.tdp-costs-card .ant-card-body {
+  padding: 16px;
+}
+
+.table-search {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  background-color: #fafafa;
+  border-radius: 4px;
+}
+
+.table-search span:first-child {
+  font-weight: 500;
+  color: #262626;
+}
+
+.record-count {
+  color: #8c8c8c;
+  font-size: 13px;
+}
+
+.tdp-costs-card .ant-table {
+  font-size: 13px;
+}
+
+.tdp-costs-card .ant-table-thead > tr > th {
+  background-color: #fafafa;
+  font-weight: 600;
+  color: #262626;
+  font-size: 12px;
+  padding: 8px 12px;
+  white-space: nowrap;
+}
+
+.tdp-costs-card .ant-table-tbody > tr > td {
+  padding: 8px 12px;
+  color: #595959;
+}
+
+.tdp-costs-card .ant-table-tbody > tr:hover > td {
+  background-color: #f5f5f5;
+}
+
+.tdp-costs-card .ant-table-cell-fix-left,
+.tdp-costs-card .ant-table-cell-fix-right {
+  background-color: #fff;
+}
+
+.tdp-costs-card .ant-table-tbody > tr:hover .ant-table-cell-fix-left,
+.tdp-costs-card .ant-table-tbody > tr:hover .ant-table-cell-fix-right {
+  background-color: #f5f5f5;
+}
+
