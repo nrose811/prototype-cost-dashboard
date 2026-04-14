@@ -1,9 +1,11 @@
 import React from 'react';
 import { Select } from 'antd';
-import { stCustomers, mtCustomers } from './mockData';
+import { stCustomers, mtCustomers, chCustomers } from './mockData';
+
+const CUSTOMER_MAP = { ST: stCustomers, MT: mtCustomers, CH: chCustomers };
 
 const CustomerSelector = ({ tenantType, selectedCustomer, onCustomerChange }) => {
-  const customers = tenantType === 'ST' ? stCustomers : mtCustomers;
+  const customers = CUSTOMER_MAP[tenantType] || stCustomers;
 
   const options = customers.map(c => ({
     value: c.id,

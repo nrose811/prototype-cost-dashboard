@@ -10,7 +10,7 @@ import OrgSlugSelector from './OrgSlugSelector';
 import DateRangePicker from './DateRangePicker';
 import TDPCostsTable from './TDPCostsTable';
 import {
-  stCustomers, mtCustomers,
+  stCustomers, mtCustomers, chCustomers,
   getDataForCustomer, isMonthInRange, normalizeMonth, formatMonth,
   MT_AWS_SERVICES, MT_DBX_SERVICES,
   AWS_SERVICE_TYPES, DBX_SERVICE_TYPES,
@@ -19,6 +19,8 @@ import {
 } from './mockData';
 import './ConsolidatedCostView.css';
 
+const CUSTOMER_MAP = { ST: stCustomers, MT: mtCustomers, CH: chCustomers };
+
 const PLATFORM_COLORS = {
   AWS: '#1890ff',
   Databricks: '#ff4d4f',
@@ -26,7 +28,7 @@ const PLATFORM_COLORS = {
 };
 
 const ConsolidatedCostView = ({ tenantType }) => {
-  const customers = tenantType === 'ST' ? stCustomers : mtCustomers;
+  const customers = CUSTOMER_MAP[tenantType] || stCustomers;
   const defaultCustomer = customers[0].id;
   const [selectedCustomer, setSelectedCustomer] = useState(defaultCustomer);
   const [selectedOrgSlug, setSelectedOrgSlug] = useState(customers[0].orgSlugs[0]);
@@ -46,8 +48,12 @@ const ConsolidatedCostView = ({ tenantType }) => {
     if (!rawData) return null;
     const [startMonth, endMonth] = dateRange;
 
-    // Filter AWS data by date range
-    const awsFiltered = rawData.aws.filter(row => isMonthInRange(row.month, startMonth, endMonth));
+    const showAws = tenantType !== 'CH';
+
+    // Filter AWS data by date range (skip for CH — customer manages their own AWS)
+    const awsFiltered = showAws
+      ? rawData.aws.filter(row => isMonthInRange(row.month, startMonth, endMonth))
+      : [];
     const awsServices = tenantType === 'ST' ? AWS_SERVICE_TYPES : MT_AWS_SERVICES;
 
     // Calculate AWS monthly totals (filtered by services)
@@ -59,7 +65,7 @@ const ConsolidatedCostView = ({ tenantType }) => {
 
     // Filter DBx data by date range
     const dbxFiltered = rawData.dbx.filter(row => isMonthInRange(row.month, startMonth, endMonth));
-    const dbxServices = tenantType === 'ST' ? DBX_SERVICE_TYPES : MT_DBX_SERVICES;
+    const dbxServices = tenantType === 'MT' ? MT_DBX_SERVICES : DBX_SERVICE_TYPES;
 
     // Calculate DBx monthly totals (filtered by services)
     const dbxMonthly = dbxFiltered.map(row => {
@@ -68,8 +74,10 @@ const ConsolidatedCostView = ({ tenantType }) => {
     });
     const dbxTotalCost = dbxMonthly.reduce((sum, m) => sum + m.total, 0);
 
-    // Filter Snowflake data
-    const snowflakeFiltered = rawData.snowflake.filter(row => isMonthInRange(row.month, startMonth, endMonth));
+    // Filter Snowflake data (only for ST)
+    const snowflakeFiltered = tenantType === 'ST'
+      ? rawData.snowflake.filter(row => isMonthInRange(row.month, startMonth, endMonth))
+      : [];
     const snowflakeTotalCost = snowflakeFiltered.reduce((sum, row) => sum + row.cost, 0);
     const hasSnowflake = tenantType === 'ST' && snowflakeTotalCost > 0;
 
@@ -94,19 +102,16 @@ const ConsolidatedCostView = ({ tenantType }) => {
     const trendData = Object.keys(monthMap).sort().map(key => monthMap[key]);
 
     // Platform breakdown for donut
-    const platformBreakdown = [
-      { name: 'AWS', value: awsTotalCost },
-      { name: 'Databricks', value: dbxTotalCost },
-    ];
-    if (hasSnowflake) {
-      platformBreakdown.push({ name: 'Snowflake', value: snowflakeTotalCost });
-    }
+    const platformBreakdown = [];
+    if (showAws) platformBreakdown.push({ name: 'AWS', value: awsTotalCost });
+    platformBreakdown.push({ name: 'Databricks', value: dbxTotalCost });
+    if (hasSnowflake) platformBreakdown.push({ name: 'Snowflake', value: snowflakeTotalCost });
 
     // Service breakdown for donut (top services by average monthly cost)
     const monthCount = trendData.length || 1;
     const serviceBreakdown = [];
 
-    // AWS services
+    // AWS services (skip for CH)
     const awsServiceTotals = {};
     awsFiltered.forEach(row => {
       awsServices.forEach(svc => {
@@ -136,22 +141,20 @@ const ConsolidatedCostView = ({ tenantType }) => {
 
     const totalCost = awsTotalCost + dbxTotalCost + snowflakeTotalCost;
     const avgMonthlyCost = totalCost / monthCount;
-    let platformCount = 2; // AWS + DBx always
-    if (hasSnowflake) platformCount = 3;
+    let platformCount = platformBreakdown.length;
 
     return {
-      awsFiltered, dbxFiltered,
+      showAws, awsFiltered, dbxFiltered,
       awsServices, dbxServices,
-      awsTotalCost, dbxTotalCost, snowflakeTotalCost,
       hasSnowflake, totalCost, avgMonthlyCost, platformCount,
-      trendData, platformBreakdown, serviceBreakdown, monthCount,
+      trendData, platformBreakdown, serviceBreakdown,
     };
   }, [rawData, dateRange, tenantType]);
 
   if (!computedData) return null;
 
   const {
-    awsFiltered, dbxFiltered,
+    showAws, awsFiltered, dbxFiltered,
     awsServices, dbxServices,
     hasSnowflake, totalCost, avgMonthlyCost, platformCount,
     trendData, platformBreakdown, serviceBreakdown,
@@ -188,6 +191,17 @@ const ConsolidatedCostView = ({ tenantType }) => {
           <Alert
             message="Single-Tenant Cost Data"
             description="For THST customers, platform usage costs are obtained from AWS Cost Explorer using amortized costs for the relevant linked account(s). Databricks costs are retrieved from Phone Home Telemetry (PHT). All services and platform fees are included — covering compute, storage, data apps, connectors, streaming, EC2, Databricks, and Snowflake where applicable."
+            type="info"
+            showIcon
+            style={{ marginBottom: 24 }}
+          />
+        )}
+
+        {/* CH Data Source Callout */}
+        {tenantType === 'CH' && (
+          <Alert
+            message="Customer-Hosted Cost Data"
+            description="For CHST customers, the customer manages their own AWS infrastructure. Only Databricks costs are tracked by TetraScience, retrieved from Phone Home Telemetry (PHT). AWS platform usage and Snowflake costs are not applicable."
             type="info"
             showIcon
             style={{ marginBottom: 24 }}
@@ -240,7 +254,7 @@ const ConsolidatedCostView = ({ tenantType }) => {
               <YAxis label={{ value: 'Cost ($)', angle: -90, position: 'insideLeft' }} />
               <Tooltip formatter={(value) => fmtCost(value)} labelStyle={{ color: '#262626' }} />
               <Legend />
-              <Line type="monotone" dataKey="aws" stroke={PLATFORM_COLORS.AWS} strokeWidth={2} dot={{ r: 4 }} name="AWS" />
+              {showAws && <Line type="monotone" dataKey="aws" stroke={PLATFORM_COLORS.AWS} strokeWidth={2} dot={{ r: 4 }} name="AWS" />}
               <Line type="monotone" dataKey="dbx" stroke={PLATFORM_COLORS.Databricks} strokeWidth={2} dot={{ r: 4 }} name="Databricks" />
               {hasSnowflake && (
                 <Line type="monotone" dataKey="snowflake" stroke={PLATFORM_COLORS.Snowflake} strokeWidth={2} dot={{ r: 4 }} name="Snowflake" />
@@ -297,21 +311,23 @@ const ConsolidatedCostView = ({ tenantType }) => {
           </Col>
         </Row>
 
-        {/* AWS Detail */}
-        <Card className="section-card" title="AWS Cost Breakdown">
-          <ResponsiveContainer width="100%" height={400}>
-            <BarChart data={awsFiltered}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="month" />
-              <YAxis label={{ value: 'Costs ($)', angle: -90, position: 'insideLeft' }} />
-              <Tooltip formatter={(value) => fmtCost(value)} />
-              <Legend />
-              {awsServices.map(svc => (
-                <Bar key={svc} dataKey={svc} stackId="a" fill={AWS_SERVICE_COLORS[svc] || '#999'} />
-              ))}
-            </BarChart>
-          </ResponsiveContainer>
-        </Card>
+        {/* AWS Detail (hidden for CH) */}
+        {showAws && (
+          <Card className="section-card" title="AWS Cost Breakdown">
+            <ResponsiveContainer width="100%" height={400}>
+              <BarChart data={awsFiltered}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="month" />
+                <YAxis label={{ value: 'Costs ($)', angle: -90, position: 'insideLeft' }} />
+                <Tooltip formatter={(value) => fmtCost(value)} />
+                <Legend />
+                {awsServices.map(svc => (
+                  <Bar key={svc} dataKey={svc} stackId="a" fill={AWS_SERVICE_COLORS[svc] || '#999'} />
+                ))}
+              </BarChart>
+            </ResponsiveContainer>
+          </Card>
+        )}
 
         {/* DBx Detail */}
         <Card className="section-card" title="Databricks Cost Breakdown">
@@ -329,12 +345,14 @@ const ConsolidatedCostView = ({ tenantType }) => {
           </ResponsiveContainer>
         </Card>
 
-        {/* TDP Costs Table */}
-        <TDPCostsTable
-          tenantType={tenantType}
-          customerId={selectedCustomer}
-          dateRange={dateRange}
-        />
+        {/* TDP Costs Table (hidden for CH — no AWS/storage costs) */}
+        {tenantType !== 'CH' && (
+          <TDPCostsTable
+            tenantType={tenantType}
+            customerId={selectedCustomer}
+            dateRange={dateRange}
+          />
+        )}
 
       </div>
     </div>

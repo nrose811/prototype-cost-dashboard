@@ -17,6 +17,11 @@ export const mtCustomers = [
   { id: 'mt-stark', name: 'Stark Labs', orgSlugs: ['stark-prod'] },
 ];
 
+export const chCustomers = [
+  { id: 'ch-merck', name: 'Merck KGaA', orgSlugs: ['merck-prod', 'merck-staging'] },
+  { id: 'ch-novartis', name: 'Novartis AG', orgSlugs: ['novartis-prod'] },
+];
+
 // ============================================================
 // Filter constants
 // ============================================================
@@ -183,6 +188,9 @@ const customerConfig = {
   'mt-umbrella': { awsMultiplier: 0.4, dbxMultiplier: 0.5, tdpMultiplier: 0.35, snowflakeMultiplier: 0 },
   'mt-wayne': { awsMultiplier: 0.6, dbxMultiplier: 0.45, tdpMultiplier: 0.5, snowflakeMultiplier: 0 },
   'mt-stark': { awsMultiplier: 0.3, dbxMultiplier: 0.35, tdpMultiplier: 0.25, snowflakeMultiplier: 0 },
+  // CHST customers (Databricks only — customer manages their own AWS)
+  'ch-merck': { awsMultiplier: 0, dbxMultiplier: 0.9, tdpMultiplier: 0, snowflakeMultiplier: 0 },
+  'ch-novartis': { awsMultiplier: 0, dbxMultiplier: 0.6, tdpMultiplier: 0, snowflakeMultiplier: 0 },
 };
 
 // ============================================================

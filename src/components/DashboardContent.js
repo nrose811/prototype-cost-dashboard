@@ -15,6 +15,11 @@ const DashboardContent = () => {
       label: 'THMT',
       children: <ConsolidatedCostView tenantType="MT" />,
     },
+    {
+      key: 'chst',
+      label: 'CHST',
+      children: <ConsolidatedCostView tenantType="CH" />,
+    },
   ];
 
   return (

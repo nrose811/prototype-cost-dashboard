@@ -1,9 +1,11 @@
 import React from 'react';
 import { Select } from 'antd';
-import { stCustomers, mtCustomers } from './mockData';
+import { stCustomers, mtCustomers, chCustomers } from './mockData';
+
+const CUSTOMER_MAP = { ST: stCustomers, MT: mtCustomers, CH: chCustomers };
 
 const OrgSlugSelector = ({ tenantType, selectedCustomer, selectedOrgSlug, onOrgSlugChange }) => {
-  const customers = tenantType === 'ST' ? stCustomers : mtCustomers;
+  const customers = CUSTOMER_MAP[tenantType] || stCustomers;
   const customer = customers.find(c => c.id === selectedCustomer);
   const slugs = customer?.orgSlugs || [];
 
