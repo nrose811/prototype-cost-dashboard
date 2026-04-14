@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { DashboardOutlined } from '@ant-design/icons';
 import { Switch } from 'antd';
 import './DashboardHeader.css';
