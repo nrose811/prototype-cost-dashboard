@@ -1,0 +1,125 @@
+/* Superset-style layout with left filter panel */
+.consolidated-layout {
+  display: flex;
+  gap: 24px;
+  min-height: calc(100vh - 140px);
+}
+
+/* Left Filter Panel */
+.filter-panel {
+  width: 260px;
+  min-width: 260px;
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid #f0f0f0;
+  height: fit-content;
+  position: sticky;
+  top: 24px;
+}
+
+.filter-panel-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #262626;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f0f0f0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.filter-group {
+  margin-bottom: 16px;
+}
+
+.filter-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #8c8c8c;
+  margin-bottom: 6px;
+}
+
+/* Main Content Area */
+.content-area {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Cards */
+.overview-card {
+  margin-bottom: 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.section-card {
+  margin-bottom: 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Metrics */
+.metric-item {
+  text-align: center;
+}
+
+.metric-label {
+  font-size: 14px;
+  color: #8c8c8c;
+  margin-bottom: 8px;
+}
+
+.metric-value {
+  font-size: 28px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.info-link {
+  color: #1890ff;
+  font-size: 14px;
+  cursor: pointer;
+  margin-left: 8px;
+}
+
+/* No data message */
+.no-data-message {
+  text-align: center;
+  color: #8c8c8c;
+  font-size: 16px;
+  padding: 60px 0;
+}
+
+/* Quarterly Summary Placeholder */
+.placeholder-card {
+  margin-bottom: 24px;
+  border: 2px dashed #d9d9d9 !important;
+  background: #fafafa !important;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.placeholder-card .ant-card-body {
+  padding: 40px;
+}
+
+.placeholder-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #595959;
+  margin-bottom: 8px;
+}
+
+.placeholder-text {
+  font-size: 14px;
+  color: #8c8c8c;
+}
+
+/* Card title styling */
+.overview-card .ant-card-head-title,
+.section-card .ant-card-head-title {
+  font-size: 16px;
+  font-weight: 600;
+}

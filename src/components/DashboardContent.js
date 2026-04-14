@@ -1,37 +1,26 @@
 import React from 'react';
 import { Tabs } from 'antd';
-import AWSCosts from './AWSCosts';
-import DBxCosts from './DBxCosts';
-import CostSummary from './CostSummary';
+import ConsolidatedCostView from './ConsolidatedCostView';
 import './DashboardContent.css';
 
-const DashboardContent = ({ tenantType }) => {
+const DashboardContent = () => {
   const items = [
     {
-      key: 'summary',
-      label: 'Cost Summary',
-      children: <CostSummary tenantType={tenantType} />,
+      key: 'thst',
+      label: 'THST',
+      children: <ConsolidatedCostView tenantType="ST" />,
     },
     {
-      key: 'aws',
-      label: 'AWS Costs',
-      children: <AWSCosts tenantType={tenantType} />,
-    },
-    {
-      key: 'dbx',
-      label: 'DBx Costs',
-      children: <DBxCosts tenantType={tenantType} />,
+      key: 'thmt',
+      label: 'THMT',
+      children: <ConsolidatedCostView tenantType="MT" />,
     },
   ];
 
   return (
     <div className="dashboard-content">
-      <div className="content-header">
-        <h2>Cost Dashboard</h2>
-      </div>
-
       <Tabs
-        defaultActiveKey="summary"
+        defaultActiveKey="thst"
         items={items}
         className="dashboard-tabs"
       />
