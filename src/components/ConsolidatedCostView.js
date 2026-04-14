@@ -140,7 +140,7 @@ const ConsolidatedCostView = ({ tenantType }) => {
     if (hasSnowflake) platformCount = 3;
 
     return {
-      awsFiltered, dbxFiltered, snowflakeFiltered,
+      awsFiltered, dbxFiltered,
       awsServices, dbxServices,
       awsTotalCost, dbxTotalCost, snowflakeTotalCost,
       hasSnowflake, totalCost, avgMonthlyCost, platformCount,
@@ -151,7 +151,7 @@ const ConsolidatedCostView = ({ tenantType }) => {
   if (!computedData) return null;
 
   const {
-    awsFiltered, dbxFiltered, snowflakeFiltered,
+    awsFiltered, dbxFiltered,
     awsServices, dbxServices,
     hasSnowflake, totalCost, avgMonthlyCost, platformCount,
     trendData, platformBreakdown, serviceBreakdown,
